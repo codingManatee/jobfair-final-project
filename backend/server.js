@@ -10,10 +10,9 @@ connectDB();
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.status(200).json({SUCCESS: true, message: 'Welcome to the server'});
-    }
-);
+const auth = require('./routes/auth');
+
+app.use('/api/v1/auth',auth);
 
 const PORT = process.env.PORT || 5001;
 
