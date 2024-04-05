@@ -43,14 +43,30 @@ exports.login = async (req,res,next) => {
     }
 }
 
-// @desc    Get logged in user
-// @route   /api/v1/auth/getMe
-// @access  Public
+// @desc    Get current logged in user
+// @route   /api/v1/auth/me
+// @access  Private
 exports.getMe = async (req,res,next) => {
     try {
-        const { token } = req.body;
-        
-    } catch {
-
+        const user = await User.findById(req.user.id);
+        res.status(200).json({ success : true , data : user })
+    } catch (err) {
+        res.status(400).json({ success :false })
     }
+}
+
+const sendTokenResponse = (user, statusCode, res) => {
+    // Create Token
+    const token = user.getSignedJwtToken();
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_EXPIRE * 24 * 60 * 60 * 1000),
+        httpOnly : true
+    };
+    if (process.env.NODE_ENV == 'production') {
+        options.secure = true
+    }
+    res.status(statusCode).cookie("token",token,options).json({
+        success : true,
+        token : token
+    })
 }
