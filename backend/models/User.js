@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
+// User schema
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,10 +26,21 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
+
+// Hash password before saving
+UserSchema.pre('save', async function(next) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password,salt);
+});
+
+// Check if the password is correct
+UserSchema.methods.matchPassword = async function(enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password)
+}
+
+module.exports=mongoose.model('User',UserSchema);
