@@ -27,15 +27,15 @@ exports.login = async (req,res,next) => {
     try {
         const { email , password } = req.body;
         if (!email || !password) {
-            res.status(400).json({ success : false , error : "Please provide email and password"});
+            return res.status(400).json({ success : false , error : "Please provide email and password"});
         }
-        const user = await User.findOne("email").select("+password");
+        const user = await User.findOne({ email }).select("+password");
         if (!user) {
-            res.status(401).json({ success : false , error : "No user in database"});
+            return res.status(401).json({ success : false , error : "No user in database"});
         }
         const isMatch = user.matchPassword(password);
         if (!isMatch) {
-            res.status(401).json({ success : false , error : "Password did not match"});
+            return res.status(401).json({ success : false , error : "Password did not match"});
         }
         res.status(200).json({ success : true , message : "Login completed"});
     } catch (err) {
