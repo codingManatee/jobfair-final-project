@@ -15,4 +15,4 @@ The Online Job Fair Registration System is designed to streamline the process of
 ### Team Members
 
 - Pattapon Vichanukroh
-- [Other Member's Name]
+- Punnawich Yiamsombat
