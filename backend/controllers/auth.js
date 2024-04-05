@@ -42,3 +42,15 @@ exports.login = async (req,res,next) => {
         console.log(err);
     }
 }
+
+// @desc    Get logged in user
+// @route   /api/v1/auth/getMe
+// @access  Public
+exports.getMe = async (req,res,next) => {
+    try {
+        const { token } = req.body;
+        
+    } catch {
+
+    }
+}
