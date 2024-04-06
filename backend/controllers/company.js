@@ -10,7 +10,7 @@ exports.createCompany = async (req,res,next) => {
     } catch (err) {
         res.status(400).json({ success : false , err });
     }
-}
+};
 
 // @desc    Get all companies
 // @route   GET /api/v1/companies
@@ -30,4 +30,22 @@ exports.getCompany = async (req,res,next) => {
     } catch (err) {
         res.status(400).json({ success : false });
     }
-}
+};
+
+// @desc    Update a company
+// @route   PUT /api/v1/companies/:id
+// @access  Private
+exports.updateCompany = async (req,res,next) => {
+    try {
+        const company = await Company.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!company) {
+            res.status(400).json({ success : false , message : "Company does not exists"});
+        }
+        res.status(200).json({ success : true , data : company });
+    } catch (err) {
+        res.status(400).json({ success : false });
+    }
+};
