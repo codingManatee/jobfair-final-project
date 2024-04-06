@@ -7,7 +7,7 @@ The Online Job Fair Registration System is designed to streamline the process of
 ### Features
 - [x] The system shall allow a user to register by specifying the name, telephone number, email, and password.
 - [x] After registration, the user becomes a registered user, and the system shall allow the user to log in to use the system by specifying the email and password. The system shall allow a registered user to log out.
-- [ ] After login, the system shall allow the registered user to book up to 3 interview sessions by specifying the date (during May 10th-13th, 2022) and the preferred companies. The company list is also provided to the user. A company information includes the company name, address, website, description, and telephone number.
+- [x] After login, the system shall allow the registered user to book up to 3 interview sessions by specifying the date (during May 10th-13th, 2022) and the preferred companies. The company list is also provided to the user. A company information includes the company name, address, website, description, and telephone number.
 - [ ] The system shall allow the registered user to view his interview session bookings.
 - [ ] The system shall allow the registered user to edit his interview session bookings.
 - [ ] The system shall allow the registered user to delete his interview session bookings.
