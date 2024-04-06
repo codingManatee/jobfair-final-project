@@ -12,11 +12,13 @@ const app = express();
 
 const auth = require('./routes/auth');
 const company = require('./routes/company');
+const booking = require('./routes/booking');
 
 app.use(express.json());
 
 app.use('/api/v1/auth',auth);
 app.use('/api/v1/',company);
+app.use('/api/v1/',booking);
 
 const PORT = process.env.PORT || 5001;
 
