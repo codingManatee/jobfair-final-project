@@ -1,5 +1,21 @@
 const User = require('../models/User');
 
+const sendTokenResponse = (user, statusCode, res) => {
+    // Create Token
+    const token = user.getSignedJwtToken();
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+        httpOnly : true
+    };
+    if (process.env.NODE_ENV == 'production') {
+        options.secure = true
+    }
+    res.status(statusCode).cookie("token",token,options).json({
+        success : true,
+        token : token
+    })
+};
+
 // @desc    Register a user
 // @route   POST /api/v1/auth/register
 // @access  Public
@@ -37,11 +53,12 @@ exports.login = async (req,res,next) => {
         if (!isMatch) {
             return res.status(401).json({ success : false , error : "Password did not match"});
         }
-        res.status(200).json({ success : true , message : "Login completed"});
+        sendTokenResponse(user,200,res);
+        // res.status(200).json({ success : true , message : "Login completed"});
     } catch (err) {
-        console.log(err);
+        console.log(err)
     }
-}
+};
 
 // @desc    Get current logged in user
 // @route   /api/v1/auth/me
@@ -53,20 +70,5 @@ exports.getMe = async (req,res,next) => {
     } catch (err) {
         res.status(400).json({ success :false })
     }
-}
+};
 
-const sendTokenResponse = (user, statusCode, res) => {
-    // Create Token
-    const token = user.getSignedJwtToken();
-    const options = {
-        expires: new Date(Date.now() + process.env.JWT_EXPIRE * 24 * 60 * 60 * 1000),
-        httpOnly : true
-    };
-    if (process.env.NODE_ENV == 'production') {
-        options.secure = true
-    }
-    res.status(statusCode).cookie("token",token,options).json({
-        success : true,
-        token : token
-    })
-}
