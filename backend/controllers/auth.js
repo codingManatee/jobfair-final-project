@@ -63,6 +63,14 @@ exports.login = async (req,res,next) => {
     }
 };
 
+// @desc    Logout a user
+// @route   GET /api/v1/auth/logout
+// @access  Private
+exports.logout = async (req,res,next) => {
+    res.clearCookie('token');
+    res.status(200).json({ success : true , messsage : "Logged out successfully"})
+}
+
 // @desc    Get current logged in user
 // @route   GET /api/v1/auth/me
 // @access  Private
