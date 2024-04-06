@@ -31,10 +31,10 @@ exports.register = async (req,res,next) => {
             email,
             password
         });
-        res.status(201).json({SUCCESS: true, user});
+        res.status(201).json({ success : true , user});
         }
     catch(err) {
-        res.status(400).json({SUCCESS: false, message: err.message});
+        res.status(400).json({ success : false, message : err.message});
         console.log(err);
     }
 };
