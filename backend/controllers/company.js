@@ -19,12 +19,10 @@ exports.createCompany = async (req, res, next) => {
 exports.getAllCompany = async (req, res, next) => {
   let query;
   const reqQuery = { ...req.query };
-  console.log(reqQuery);
   const removeFields = ["select", "sort", "page", "limit"];
 
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach((param) => delete reqQuery[param]);
-  console.log(reqQuery);
 
   // Create String Query
   let queryStr = JSON.stringify(req.query);
