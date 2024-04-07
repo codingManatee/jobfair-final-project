@@ -2,6 +2,34 @@ const Booking = require('../models/Booking');
 const Company = require('../models/Company');
 const User = require('../models/User');
 
+// @desc    Get ALL booking
+// @route   GET /api/v1/booking
+// @access  Private
+exports.getAllBooking = async (req,res,next) => {
+    let query;
+    let companyId = req.query["CompanyId"];
+    if (req.user.role !== "admin") {
+        if (companyId) {
+            query = Booking.find({ user: req.user.id , company: companyId}).populate({ path : "company", select : "name address telephone"});
+        } else {
+            query = Booking.find({ user : req.user.id }).populate({ path : "company", select : "name address telephone"});
+        }
+    } else {
+        if (companyId) {
+            query = Booking.find({ company : companyId }).populate({ path : "company", select : "name address telephone"});
+        } else {
+            query = Booking.find({ }).populate({ path : "company", select : "name address telephone"});
+        }
+    }
+    try {
+        const booking = await query;
+        return res.status(200).json({ success : true , count : booking.length , data : booking });
+    } catch (err) {
+        return res.status(400).json({ success : false , message : "Cannot find any booking"});
+    }
+}
+
+
 // @desc    Get a booking 
 // @route   GET /api/v1/booking/:id
 // @access  Private
