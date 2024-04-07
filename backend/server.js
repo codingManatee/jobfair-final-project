@@ -17,8 +17,8 @@ const booking = require('./routes/booking');
 app.use(express.json());
 
 app.use('/api/v1/auth',auth);
-app.use('/api/v1/',company);
-app.use('/api/v1/',booking);
+app.use('/api/v1/companies',company);
+app.use('/api/v1/booking',booking);
 
 const PORT = process.env.PORT || 5001;
 

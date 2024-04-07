@@ -1,5 +1,6 @@
-const Booking = require('../models/Booking')
-const Company = require('../models/Company')
+const Booking = require('../models/Booking');
+const Company = require('../models/Company');
+const User = require('../models/User');
 
 // @desc    Get a booking 
 // @route   GET /api/v1/booking/:id
@@ -8,11 +9,11 @@ exports.getBooking = async (req,res,next) => {
     let booking;
     try {
         booking = await Booking.findById(req.params.id).populate({
-            path : "Company",
-            select : "name address tel"
+            path : "company",
+            select : "name address telephone"
         });
         if (!booking) {
-            return res.status(400).json({ success : false , message : `No booking with the id of ${req.parms.id}`});
+            return res.status(400).json({ success : false , message : `No booking with the id of ${req.params.id}`});
         }
         if (booking.user.toString() !== req.user.id && req.user.role !== "admin"){
             return res.status(401).json({ success : false , message : `User ${req.user.id} is not authorized to view this booking`});
@@ -29,7 +30,6 @@ exports.getBooking = async (req,res,next) => {
 // @access  Private
 exports.createBooking = async (req,res,next) => {
     try {
-        console.log(req.params)
         req.body.company = req.params.companyId;
         const company = await Company.findById(req.params.companyId);
         if (!company) {
@@ -48,6 +48,22 @@ exports.createBooking = async (req,res,next) => {
             return res.status(400).json({ success : false , message : "Cannot create booking"});
         }
         res.status(201).json({ success : true , data : booking });
+    } catch (err) {
+        res.status(400).json({ success : false })
+    }
+}
+
+// @desc    Delete a booking
+// @route   DELETE /api/v1/booking/:id
+// @access  Private
+exports.deleteBooking = async (req,res,next) => {
+    try {
+        const booking = Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(400).json({ success : false , message : "Booking does not exists"})
+        }
+        await Booking.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success : true , message : "Booking has been deleted"});
     } catch (err) {
         res.status(400).json({ success : false })
     }
