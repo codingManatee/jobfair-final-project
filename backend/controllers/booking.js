@@ -30,12 +30,10 @@ exports.getBooking = async (req,res,next) => {
 // @access  Private
 exports.createBooking = async (req,res,next) => {
     try {
-        req.body.company = req.params.companyId;
         const company = await Company.findById(req.params.companyId);
         if (!company) {
             return res.status(400).json({ success : false , message : "Company does not exists"});
         }
-        req.body.user = req.params.user.id;
 
         const existedBookings = await Booking.find({ user : req.user.id });
 
@@ -53,12 +51,35 @@ exports.createBooking = async (req,res,next) => {
     }
 }
 
+// @desc    Update a booking
+// @route   UPDATE /api/v1/booking/:id
+// @access  Private
+exports.updateBooking = async (req,res,next) => {
+    try {
+        let booking = Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(400).json({ success : false , message : "Booking does not exists"});
+        }
+        if (booking.user.toString() !== req.user.id || req.user.role !== "admin") {
+            return res.status(400).json({ success : false , message : `User ${req.user.id} is not authorized to update this booking`});
+        }
+        booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
+            new : true,
+            runValidators : true,
+        })
+        res.status(200).json({ success : true , data : booking });
+    } catch (err) {
+        res.status(400).json({ success : false });
+    }
+}
+
 // @desc    Delete a booking
 // @route   DELETE /api/v1/booking/:id
 // @access  Private
 exports.deleteBooking = async (req,res,next) => {
     try {
         const booking = Booking.findById(req.params.id);
+        console.log(booking);
         if (!booking) {
             return res.status(400).json({ success : false , message : "Booking does not exists"})
         }
