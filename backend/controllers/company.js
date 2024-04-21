@@ -16,6 +16,7 @@ exports.createCompany = async (req, res, next) => {
 // @desc    Get all companies
 // @route   GET /api/v1/companies
 // @access  Public
+
 exports.getAllCompany = async (req, res, next) => {
   let query;
   const reqQuery = { ...req.query };
@@ -25,13 +26,23 @@ exports.getAllCompany = async (req, res, next) => {
   removeFields.forEach((param) => delete reqQuery[param]);
 
   // Create String Query
-  let queryStr = JSON.stringify(req.query);
+  let queryStr = JSON.stringify(reqQuery);
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
 
-  query = Company.find(JSON.parse(queryStr)).populate("booking");
+  // Attempt to parse the query string for MongoDB
+  let parsedQueryStr;
+  try {
+    parsedQueryStr = JSON.parse(queryStr);
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid query syntax", err });
+  }
+
+  query = Company.find(parsedQueryStr);
 
   // Select Fields
   if (req.query.select) {
@@ -52,9 +63,11 @@ exports.getAllCompany = async (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 25;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
+
   try {
-    const total = await Company.countDocuments();
+    const total = await Company.countDocuments(parsedQueryStr);
     query = query.skip(startIndex).limit(limit);
+
     // Executing query
     const company = await query;
     // Pagination result
@@ -72,11 +85,17 @@ exports.getAllCompany = async (req, res, next) => {
         limit,
       };
     }
-    res
-      .status(200)
-      .json({ success: true, count: company.length, data: company });
+
+    res.status(200).json({
+      success: true,
+      count: company.length,
+      pagination,
+      data: company,
+    });
   } catch (err) {
-    res.status(400).json({ success: false });
+    res
+      .status(400)
+      .json({ success: false, message: "Error retrieving companies", err });
   }
 };
 
