@@ -21,6 +21,6 @@ router
   .put(protect, authorization("admin"), updateCompany)
   .delete(protect, authorization("admin"), deleteCompany);
 
-router.use("/:companyId/booking", bookingRouter);
+router.use("/:companyId/bookings", bookingRouter);
 
 module.exports = router;

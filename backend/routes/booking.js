@@ -1,6 +1,6 @@
 const express = require('express');
 const { getBooking, createBooking, deleteBooking, updateBooking, getAllBooking } = require('../controllers/booking');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 const { protect , authorization } = require('../middleware/auth')
 

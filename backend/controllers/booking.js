@@ -10,27 +10,47 @@ exports.getAllBooking = async (req, res, next) => {
   let companyId = req.query["CompanyId"];
   if (req.user.role !== "admin") {
     if (companyId) {
-      query = Booking.find({ user: req.user.id, company: companyId }).populate({
-        path: "company",
-        select: "name address telephone",
-      });
+      query = Booking.find({ user: req.user.id, company: companyId })
+        .populate({
+          path: "company",
+          select: "name address telephone",
+        })
+        .populate({
+          path: "user",
+          select: "name email telephone",
+        });
     } else {
-      query = Booking.find({ user: req.user.id }).populate({
-        path: "company",
-        select: "name address telephone",
-      });
+      query = Booking.find({ user: req.user.id })
+        .populate({
+          path: "company",
+          select: "name address telephone",
+        })
+        .populate({
+          path: "user",
+          select: "name email telephone",
+        });
     }
   } else {
     if (companyId) {
-      query = Booking.find({ company: companyId }).populate({
-        path: "company",
-        select: "name address telephone",
-      });
+      query = Booking.find({ company: companyId })
+        .populate({
+          path: "company",
+          select: "name address telephone",
+        })
+        .populate({
+          path: "user",
+          select: "name email telephone",
+        });
     } else {
-      query = Booking.find({}).populate({
-        path: "company",
-        select: "name address telephone",
-      });
+      query = Booking.find({})
+        .populate({
+          path: "company",
+          select: "name address telephone",
+        })
+        .populate({
+          path: "user",
+          select: "name email telephone",
+        });
     }
   }
   try {
@@ -87,20 +107,21 @@ exports.createBooking = async (req, res, next) => {
     }
 
     const existedBookings = await Booking.find({ user: req.user.id });
-
-    if (existedBookings >= 3) {
+    
+    if (existedBookings.length >= 3) {
       return res.status(400).json({
         success: false,
         message: "Cannot create more than 3 bookings",
       });
     }
 
-    const booking = Booking.create(req.body);
+    const booking = await Booking.create(req.body);
     if (!booking) {
       return res
         .status(400)
         .json({ success: false, message: "Cannot create booking" });
     }
+
     res.status(201).json({ success: true, data: booking });
   } catch (err) {
     res.status(400).json({ success: false });
@@ -139,17 +160,25 @@ exports.updateBooking = async (req, res, next) => {
 // @access  Private
 exports.deleteBooking = async (req, res, next) => {
   try {
-    const booking = Booking.findById(req.params.id);
-    console.log(booking);
+    const booking = await Booking.findById(req.params.id);
     if (!booking) {
       return res
         .status(400)
         .json({ success: false, message: "Booking does not exists" });
+        
     }
-    await Booking.findByIdAndDelete(req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Booking has been deleted" });
+
+    if (booking.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to delete this booking`,
+      });
+    } else {
+      await Booking.findByIdAndDelete(req.params.id);
+      return res
+        .status(200)
+        .json({ success: true, message: "Booking has been deleted" });
+    }
   } catch (err) {
     res.status(400).json({ success: false });
   }
