@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/User.js");
 
 const sendTokenResponse = (user, statusCode, res) => {
   // Create Token
@@ -26,13 +26,15 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, telephone, email, password } = req.body;
+    const { name, telephone, email, password, role } = req.body;
     const user = await User.create({
       name,
       telephone,
       email,
       password,
+      role,
     });
+    sendTokenResponse(user, 200, res);
     res.status(201).json({ success: true, user });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
