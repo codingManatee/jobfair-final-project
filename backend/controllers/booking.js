@@ -133,19 +133,14 @@ exports.createBooking = async (req, res, next) => {
 // @access  Private
 exports.updateBooking = async (req, res, next) => {
   try {
-    let booking = Booking.findById(req.params.id);
-    if (!booking) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Booking does not exists" });
-    }
-    if (booking.user.toString() !== req.user.id || req.user.role !== "admin") {
-      return res.status(400).json({
+    const response = await Booking.findById(req.params.id)
+    if (response.user._id.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(401).json({
         success: false,
-        message: `User ${req.user.id} is not authorized to update this booking`,
+        message: `User ${req.user.id} is not authorized to view this booking`,
       });
     }
-    booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
+    const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
